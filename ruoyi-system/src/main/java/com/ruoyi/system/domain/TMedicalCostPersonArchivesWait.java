@@ -1,0 +1,107 @@
+package com.ruoyi.system.domain;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+import com.ruoyi.common.annotation.Excel;
+import com.ruoyi.common.core.domain.BaseEntity;
+
+/**
+ * 候诊室对象 t_medical_cost_person_archives_wait
+ * 
+ * @author ruoyi
+ * @date 2022-09-02
+ */
+public class TMedicalCostPersonArchivesWait extends BaseEntity
+{
+    private static final long serialVersionUID = 1L;
+
+    /** 患者编号 */
+    private String id;
+
+    /** 患者姓名 */
+    @Excel(name = "患者姓名")
+    private String name;
+
+    /** 患者年龄 */
+    @Excel(name = "患者年龄")
+    private Long age;
+
+    /** 患者身份证号码 */
+    @Excel(name = "患者身份证号码")
+    private String code;
+
+    /** 患者性别 */
+    @Excel(name = "患者性别")
+    private String sex;
+
+    /** 候诊状态 */
+    @Excel(name = "候诊状态")
+    private Integer type;
+
+    public void setId(String id) 
+    {
+        this.id = id;
+    }
+
+    public String getId() 
+    {
+        return id;
+    }
+    public void setName(String name) 
+    {
+        this.name = name;
+    }
+
+    public String getName() 
+    {
+        return name;
+    }
+    public void setAge(Long age) 
+    {
+        this.age = age;
+    }
+
+    public Long getAge() 
+    {
+        return age;
+    }
+    public void setCode(String code) 
+    {
+        this.code = code;
+    }
+
+    public String getCode() 
+    {
+        return code;
+    }
+    public void setSex(String sex) 
+    {
+        this.sex = sex;
+    }
+
+    public String getSex() 
+    {
+        return sex;
+    }
+    public void setType(Integer type) 
+    {
+        this.type = type;
+    }
+
+    public Integer getType() 
+    {
+        return type;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
+            .append("id", getId())
+            .append("name", getName())
+            .append("age", getAge())
+            .append("code", getCode())
+            .append("sex", getSex())
+            .append("type", getType())
+            .toString();
+    }
+}

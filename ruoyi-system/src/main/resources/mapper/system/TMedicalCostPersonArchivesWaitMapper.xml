@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TMedicalCostPersonArchivesWaitMapper">
+    
+    <resultMap type="TMedicalCostPersonArchivesWait" id="TMedicalCostPersonArchivesWaitResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="age"    column="age"    />
+        <result property="code"    column="code"    />
+        <result property="sex"    column="sex"    />
+        <result property="type"    column="type"    />
+    </resultMap>
+
+    <sql id="selectTMedicalCostPersonArchivesWaitVo">
+        select id, name, age, code, sex, type from t_medical_cost_person_archives_wait
+    </sql>
+
+    <select id="selectTMedicalCostPersonArchivesWaitList" parameterType="TMedicalCostPersonArchivesWait" resultMap="TMedicalCostPersonArchivesWaitResult">
+        <include refid="selectTMedicalCostPersonArchivesWaitVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="age != null "> and age = #{age}</if>
+            <if test="code != null  and code != ''"> and code = #{code}</if>
+            <if test="sex != null  and sex != ''"> and sex = #{sex}</if>
+            <if test="type != null "> and type = #{type}</if>
+        </where>
+    </select>
+    
+    <select id="selectTMedicalCostPersonArchivesWaitById" parameterType="String" resultMap="TMedicalCostPersonArchivesWaitResult">
+        <include refid="selectTMedicalCostPersonArchivesWaitVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertTMedicalCostPersonArchivesWait" parameterType="TMedicalCostPersonArchivesWait">
+        insert into t_medical_cost_person_archives_wait
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="name != null">name,</if>
+            <if test="age != null">age,</if>
+            <if test="code != null">code,</if>
+            <if test="sex != null">sex,</if>
+            <if test="type != null">type,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="name != null">#{name},</if>
+            <if test="age != null">#{age},</if>
+            <if test="code != null">#{code},</if>
+            <if test="sex != null">#{sex},</if>
+            <if test="type != null">#{type},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTMedicalCostPersonArchivesWait" parameterType="TMedicalCostPersonArchivesWait">
+        update t_medical_cost_person_archives_wait
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">name = #{name},</if>
+            <if test="age != null">age = #{age},</if>
+            <if test="code != null">code = #{code},</if>
+            <if test="sex != null">sex = #{sex},</if>
+            <if test="type != null">type = #{type},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteTMedicalCostPersonArchivesWaitById" parameterType="String">
+        delete from t_medical_cost_person_archives_wait where id = #{id}
+    </delete>
+
+    <delete id="deleteTMedicalCostPersonArchivesWaitByIds" parameterType="String">
+        delete from t_medical_cost_person_archives_wait where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

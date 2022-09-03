@@ -338,7 +338,7 @@ export default {
       rules: {
         money: [
           { required: true, message: "金额不能为空", trigger: "blur" },
-          {validator:this.isOneToNinetyNine,trigger:"blur"}
+          { validator:this.isOneToNinetyNine, trigger:"blur"}
         ],
         type: [
           { required: true, message: "类型不能为空", trigger: "change" }

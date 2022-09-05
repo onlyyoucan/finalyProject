@@ -375,7 +375,7 @@ export default {
         return callback(new Error('输入不可以为空'));
       }
       setTimeout(() => {
-        if (!Number(value)) {
+        if (this.record.money < 0 || isNaN(this.record.money)) {
           callback(new Error('请输入正整数'));
         } else {
           if (this.record.type == 2) {

@@ -381,7 +381,6 @@ export default {
           if (this.record.type == 2) {
             if(this.record.money > this.row.money){
               callback(new Error('金额错误'));
-            }else{
               callback();
             }
           }else{

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TMedicalEmrDoctorsorderMapper">
+    
+    <resultMap type="TMedicalEmrDoctorsorder" id="TMedicalEmrDoctorsorderResult">
+        <result property="id"    column="id"    />
+        <result property="personid"    column="personId"    />
+        <result property="doctorid"    column="doctorId"    />
+        <result property="status"    column="status"    />
+        <result property="type"    column="type"    />
+        <result property="description"    column="description"    />
+        <result property="createtime"    column="createTime"    />
+    </resultMap>
+
+    <sql id="selectTMedicalEmrDoctorsorderVo">
+        select id, personId, doctorId, status, type, description, createTime from t_medical_emr_doctorsorder
+    </sql>
+
+    <select id="selectTMedicalEmrDoctorsorderList" parameterType="TMedicalEmrDoctorsorder" resultMap="TMedicalEmrDoctorsorderResult">
+        <include refid="selectTMedicalEmrDoctorsorderVo"/>
+        <where>  
+            <if test="personid != null  and personid != ''"> and personId = #{personid}</if>
+            <if test="doctorid != null  and doctorid != ''"> and doctorId = #{doctorid}</if>
+            <if test="status != null "> and status = #{status}</if>
+            <if test="type != null "> and type = #{type}</if>
+            <if test="description != null  and description != ''"> and description = #{description}</if>
+            <if test="createtime != null "> and createTime = #{createtime}</if>
+        </where>
+    </select>
+    
+    <select id="selectTMedicalEmrDoctorsorderById" parameterType="String" resultMap="TMedicalEmrDoctorsorderResult">
+        <include refid="selectTMedicalEmrDoctorsorderVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertTMedicalEmrDoctorsorder" parameterType="TMedicalEmrDoctorsorder">
+        insert into t_medical_emr_doctorsorder
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="personid != null">personId,</if>
+            <if test="doctorid != null">doctorId,</if>
+            <if test="status != null">status,</if>
+            <if test="type != null">type,</if>
+            <if test="description != null">description,</if>
+            <if test="createtime != null">createTime,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="personid != null">#{personid},</if>
+            <if test="doctorid != null">#{doctorid},</if>
+            <if test="status != null">#{status},</if>
+            <if test="type != null">#{type},</if>
+            <if test="description != null">#{description},</if>
+            <if test="createtime != null">#{createtime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTMedicalEmrDoctorsorder" parameterType="TMedicalEmrDoctorsorder">
+        update t_medical_emr_doctorsorder
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="personid != null">personId = #{personid},</if>
+            <if test="doctorid != null">doctorId = #{doctorid},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="createtime != null">createTime = #{createtime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteTMedicalEmrDoctorsorderById" parameterType="String">
+        delete from t_medical_emr_doctorsorder where id = #{id}
+    </delete>
+
+    <delete id="deleteTMedicalEmrDoctorsorderByIds" parameterType="String">
+        delete from t_medical_emr_doctorsorder where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

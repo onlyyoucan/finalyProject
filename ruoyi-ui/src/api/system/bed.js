@@ -15,6 +15,7 @@ export function getBed(id) {
     url: '/system/bed/' + id,
     method: 'get'
   })
+
 }
 
 // 新增床位记录

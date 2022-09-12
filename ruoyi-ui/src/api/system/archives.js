@@ -26,15 +26,6 @@ export function addArchives(data) {
   })
 }
 
-// 新增门诊卡信息
-export function addInfo(data) {
-  return request({
-    url: '/system/archives/addInfo',
-    method: 'post',
-    data: data
-  })
-}
-
 // 修改个人档案
 export function updateArchives(data) {
   return request({

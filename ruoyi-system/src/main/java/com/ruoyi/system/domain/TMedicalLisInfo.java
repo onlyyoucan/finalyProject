@@ -1,65 +1,52 @@
 package com.ruoyi.system.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.core.domain.BaseEntity;
+import org.apache.xmlbeans.GDate;
 
-import java.io.Serializable;
+import java.util.Date;
 
 /**
- * 医嘱记录对象 t_medical_emr_doctorsorder
+ * Lis检验信息对象 t_medical_lis_info
  * 
  * @author ruoyi
- * @date 2022-09-06
+ * @date 2022-09-07
  */
-@AllArgsConstructor
-@NoArgsConstructor
-@Data
-public class TMedicalEmrDoctorsorder extends BaseEntity implements Serializable
+public class TMedicalLisInfo extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
     /** 编号 */
     private String id;
 
+    /** 消费事项 */
+    @Excel(name = "消费事项")
+    private String name;
+
     /** 患者编号 */
     @Excel(name = "患者编号")
     private String personid;
 
-    /** 主治医生编号 */
-    @Excel(name = "主治医生编号")
+    /** 医生编号 */
+    @Excel(name = "医生编号")
     private String doctorid;
 
     /** 状态 */
     @Excel(name = "状态")
     private Long status;
 
-    /** 类型 */
-    @Excel(name = "类型")
-    private Long type;
-
-    /** 医嘱描述 */
-    @Excel(name = "医嘱描述")
-    private String description;
+    /** 生成日期 */
+    @Excel(name = "生成日期 ")
+    private Date createTime;
 
 
+    /** 门诊医生接诊记录编号 */
+    @Excel(name = "门诊医生接诊记录编号")
+    private String receiverecordid;
 
-    @Excel(name = "医嘱时间")
-    private String createtime;
-
-    public String getCreatetime() {
-        return createtime;
-    }
-
-    public void setCreatetime(String createtime) {
-        this.createtime = createtime;
-    }
-
-    public void setId(String id)
+    public void setId(String id) 
     {
         this.id = id;
     }
@@ -67,6 +54,15 @@ public class TMedicalEmrDoctorsorder extends BaseEntity implements Serializable
     public String getId() 
     {
         return id;
+    }
+    public void setName(String name) 
+    {
+        this.name = name;
+    }
+
+    public String getName() 
+    {
+        return name;
     }
     public void setPersonid(String personid) 
     {
@@ -95,35 +91,29 @@ public class TMedicalEmrDoctorsorder extends BaseEntity implements Serializable
     {
         return status;
     }
-    public void setType(Long type) 
+    public void setReceiverecordid(String receiverecordid) 
     {
-        this.type = type;
+        this.receiverecordid = receiverecordid;
     }
 
-    public Long getType() 
+    public String getReceiverecordid() 
     {
-        return type;
-    }
-    public void setDescription(String description) 
-    {
-        this.description = description;
+        return receiverecordid;
     }
 
-    public String getDescription() 
-    {
-        return description;
-    }
+
+
 
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
             .append("id", getId())
+            .append("name", getName())
             .append("personid", getPersonid())
             .append("doctorid", getDoctorid())
+            .append("createTime", getCreateTime())
             .append("status", getStatus())
-            .append("type", getType())
-            .append("description", getDescription())
-            .append("createtime", getCreateTime())
+            .append("receiverecordid", getReceiverecordid())
             .toString();
     }
 }

@@ -1,39 +1,29 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="患者姓名" prop="name">
+      <el-form-item label="病房名称" prop="name">
         <el-input
           v-model="queryParams.name"
-          placeholder="请输入患者姓名"
+          placeholder="请输入病房名称"
           clearable
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="患者年龄" prop="age">
+      <el-form-item label="规格" prop="unit">
         <el-input
-          v-model="queryParams.age"
-          placeholder="请输入患者年龄"
+          v-model="queryParams.unit"
+          placeholder="请输入规格"
           clearable
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="患者身份证" prop="code">
+      <el-form-item label="属性" prop="attribute">
         <el-input
-          v-model="queryParams.code"
-          placeholder="请输入患者身份证"
+          v-model="queryParams.attribute"
+          placeholder="请输入属性"
           clearable
           @keyup.enter.native="handleQuery"
         />
-      </el-form-item>
-      <el-form-item label="患者性别" prop="sex">
-        <el-select v-model="queryParams.sex" placeholder="请选择患者性别" clearable>
-          <el-option
-            v-for="dict in dict.type.sys_user_sex"
-            :key="dict.value"
-            :label="dict.label"
-            :value="dict.value"
-          />
-        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -49,7 +39,7 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
-          v-hasPermi="['system:archives:add']"
+          v-hasPermi="['system:sickroom:add']"
         >新增</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -60,7 +50,7 @@
           size="mini"
           :disabled="single"
           @click="handleUpdate"
-          v-hasPermi="['system:archives:edit']"
+          v-hasPermi="['system:sickroom:edit']"
         >修改</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -71,7 +61,7 @@
           size="mini"
           :disabled="multiple"
           @click="handleDelete"
-          v-hasPermi="['system:archives:remove']"
+          v-hasPermi="['system:sickroom:remove']"
         >删除</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -81,23 +71,19 @@
           icon="el-icon-download"
           size="mini"
           @click="handleExport"
-          v-hasPermi="['system:archives:export']"
+          v-hasPermi="['system:sickroom:export']"
         >导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="archivesList" @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :data="sickroomList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="个人档案编号" align="center" prop="id" />
-      <el-table-column label="患者姓名" align="center" prop="name" />
-      <el-table-column label="患者年龄" align="center" prop="age" />
-      <el-table-column label="患者身份证" align="center" prop="code" />
-      <el-table-column label="患者性别" align="center" prop="sex">
-        <template slot-scope="scope">
-          <dict-tag :options="dict.type.sys_user_sex" :value="scope.row.sex"/>
-        </template>
-      </el-table-column>
+      <el-table-column label="编号" align="center" prop="id" />
+      <el-table-column label="病房名称" align="center" prop="name" />
+      <el-table-column label="规格" align="center" prop="unit" />
+      <el-table-column label="属性" align="center" prop="attribute" />
+      <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -105,14 +91,14 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
-            v-hasPermi="['system:archives:edit']"
+            v-hasPermi="['system:sickroom:edit']"
           >修改</el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
-            v-hasPermi="['system:archives:remove']"
+            v-hasPermi="['system:sickroom:remove']"
           >删除</el-button>
         </template>
       </el-table-column>
@@ -126,26 +112,20 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改个人档案对话框 -->
+    <!-- 添加或修改病房记录对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="患者姓名" prop="name">
-          <el-input v-model="form.name" placeholder="请输入患者姓名" />
+        <el-form-item label="病房名称" prop="name">
+          <el-input v-model="form.name" placeholder="请输入病房名称" />
         </el-form-item>
-        <el-form-item label="患者年龄" prop="age">
-          <el-input v-model="form.age" placeholder="请输入患者年龄" />
+        <el-form-item label="规格" prop="unit">
+          <el-input v-model="form.unit" placeholder="请输入规格" />
         </el-form-item>
-        <el-form-item label="患者身份证" prop="code">
-          <el-input v-model="form.code" placeholder="请输入患者身份证" />
+        <el-form-item label="属性" prop="attribute">
+          <el-input v-model="form.attribute" placeholder="请输入属性" />
         </el-form-item>
-        <el-form-item label="患者性别">
-          <el-radio-group v-model="form.sex">
-            <el-radio
-              v-for="dict in dict.type.sys_user_sex"
-              :key="dict.value"
-:label="dict.value"
-            >{{dict.label}}</el-radio>
-          </el-radio-group>
+        <el-form-item label="备注" prop="remark">
+          <el-input v-model="form.remark" placeholder="请输入备注" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -157,11 +137,10 @@
 </template>
 
 <script>
-import { listArchives, getArchives, delArchives, addArchives, updateArchives } from "@/api/system/archives";
+import { listSickroom, getSickroom, delSickroom, addSickroom, updateSickroom } from "@/api/system/sickroom";
 
 export default {
-  name: "Archives",
-  dicts: ['sys_user_sex'],
+  name: "Sickroom",
   data() {
     return {
       // 遮罩层
@@ -176,8 +155,8 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // 个人档案表格数据
-      archivesList: [],
+      // 病房记录表格数据
+      sickroomList: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -187,9 +166,8 @@ export default {
         pageNum: 1,
         pageSize: 10,
         name: null,
-        age: null,
-        code: null,
-        sex: null
+        unit: null,
+        attribute: null,
       },
       // 表单参数
       form: {},
@@ -202,11 +180,11 @@ export default {
     this.getList();
   },
   methods: {
-    /** 查询个人档案列表 */
+    /** 查询病房记录列表 */
     getList() {
       this.loading = true;
-      listArchives(this.queryParams).then(response => {
-        this.archivesList = response.rows;
+      listSickroom(this.queryParams).then(response => {
+        this.sickroomList = response.rows;
         this.total = response.total;
         this.loading = false;
       });
@@ -221,9 +199,9 @@ export default {
       this.form = {
         id: null,
         name: null,
-        age: null,
-        code: null,
-        sex: "0"
+        unit: null,
+        attribute: null,
+        remark: null
       };
       this.resetForm("form");
     },
@@ -247,16 +225,16 @@ export default {
     handleAdd() {
       this.reset();
       this.open = true;
-      this.title = "添加个人档案";
+      this.title = "添加病房记录";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
       const id = row.id || this.ids
-      getArchives(id).then(response => {
+      getSickroom(id).then(response => {
         this.form = response.data;
         this.open = true;
-        this.title = "修改个人档案";
+        this.title = "修改病房记录";
       });
     },
     /** 提交按钮 */
@@ -264,13 +242,13 @@ export default {
       this.$refs["form"].validate(valid => {
         if (valid) {
           if (this.form.id != null) {
-            updateArchives(this.form).then(response => {
+            updateSickroom(this.form).then(response => {
               this.$modal.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
-            addArchives(this.form).then(response => {
+            addSickroom(this.form).then(response => {
               this.$modal.msgSuccess("新增成功");
               this.open = false;
               this.getList();
@@ -282,8 +260,8 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
-      this.$modal.confirm('是否确认删除个人档案编号为"' + ids + '"的数据项？').then(function() {
-        return delArchives(ids);
+      this.$modal.confirm('是否确认删除病房记录编号为"' + ids + '"的数据项？').then(function() {
+        return delSickroom(ids);
       }).then(() => {
         this.getList();
         this.$modal.msgSuccess("删除成功");
@@ -291,9 +269,9 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      this.download('system/archives/export', {
+      this.download('system/sickroom/export', {
         ...this.queryParams
-      }, `archives_${new Date().getTime()}.xlsx`)
+      }, `sickroom_${new Date().getTime()}.xlsx`)
     }
   }
 };

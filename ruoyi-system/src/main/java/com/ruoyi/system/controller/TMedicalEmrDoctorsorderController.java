@@ -1,6 +1,7 @@
 package com.ruoyi.system.controller;
 
 import java.util.List;
+import java.util.UUID;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,6 +78,7 @@ public class TMedicalEmrDoctorsorderController extends BaseController
     @PostMapping
     public AjaxResult add(@RequestBody TMedicalEmrDoctorsorder tMedicalEmrDoctorsorder)
     {
+        tMedicalEmrDoctorsorder.setId(UUID.randomUUID().toString().replace("-", ""));
         return toAjax(tMedicalEmrDoctorsorderService.insertTMedicalEmrDoctorsorder(tMedicalEmrDoctorsorder));
     }
 

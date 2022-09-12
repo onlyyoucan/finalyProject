@@ -1,55 +1,29 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="消费事项" prop="name">
+      <el-form-item label="门诊卡id" prop="outpatientid">
         <el-input
-          v-model="queryParams.name"
-          placeholder="请输入消费事项"
+          v-model="queryParams.outpatientid"
+          placeholder="请输入门诊卡id"
           clearable
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="患者编号" prop="personid">
+      <el-form-item label="金额" prop="money">
         <el-input
-          v-model="queryParams.personid"
-          placeholder="请输入患者编号"
+          v-model="queryParams.money"
+          placeholder="请输入金额"
           clearable
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="医生编号" prop="doctorid">
-        <el-input
-          v-model="queryParams.doctorid"
-          placeholder="请输入医生编号"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="生成时间" prop="createTime">
+      <el-form-item label="充值取现日期" prop="createtime">
         <el-date-picker clearable
-                        v-model="queryParams.createTime"
+                        v-model="queryParams.createtime"
                         type="date"
                         value-format="yyyy-MM-dd"
-                        placeholder="请选择生成时间">
+                        placeholder="请选择充值取现日期">
         </el-date-picker>
-      </el-form-item>
-      <el-form-item label="状态" prop="status">
-        <el-select v-model="queryParams.status" placeholder="请选择状态" clearable>
-          <el-option
-            v-for="dict in dict.type.t_medical_lis_info"
-            :key="dict.value"
-            :label="dict.label"
-            :value="dict.value"
-          />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="门诊医生接诊记录编号" prop="receiverecordid">
-        <el-input
-          v-model="queryParams.receiverecordid"
-          placeholder="请输入门诊医生接诊记录编号"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -65,7 +39,7 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
-          v-hasPermi="['system:info1:add']"
+          v-hasPermi="['system:bill:add']"
         >新增</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -76,7 +50,7 @@
           size="mini"
           :disabled="single"
           @click="handleUpdate"
-          v-hasPermi="['system:info1:edit']"
+          v-hasPermi="['system:bill:edit']"
         >修改</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -87,7 +61,7 @@
           size="mini"
           :disabled="multiple"
           @click="handleDelete"
-          v-hasPermi="['system:info1:remove']"
+          v-hasPermi="['system:bill:remove']"
         >删除</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -97,29 +71,22 @@
           icon="el-icon-download"
           size="mini"
           @click="handleExport"
-          v-hasPermi="['system:info1:export']"
+          v-hasPermi="['system:bill:export']"
         >导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="infoList" @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :data="billList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="编号" align="center" prop="id" />
-      <el-table-column label="消费事项" align="center" prop="name" />
-      <el-table-column label="患者编号" align="center" prop="personid" />
-      <el-table-column label="医生编号" align="center" prop="doctorid" />
-      <el-table-column label="生成时间" align="center" prop="createTime" width="180">
+      <el-table-column label="患者费用账单编号" align="center" prop="id" />
+      <el-table-column label="门诊卡id" align="center" prop="outpatientid" />
+      <el-table-column label="金额" align="center" prop="money" />
+      <el-table-column label="充值取现日期" align="center" prop="createtime" width="180">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
+          <span>{{ parseTime(scope.row.createtime, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="状态" align="center" prop="status">
-        <template slot-scope="scope">
-          <dict-tag :options="dict.type.t_medical_lis_info" :value="scope.row.status"/>
-        </template>
-      </el-table-column>
-      <el-table-column label="门诊医生接诊记录编号" align="center" prop="receiverecordid" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -127,14 +94,14 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
-            v-hasPermi="['system:info1:edit']"
+            v-hasPermi="['system:bill:edit']"
           >修改</el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
-            v-hasPermi="['system:info1:remove']"
+            v-hasPermi="['system:bill:remove']"
           >删除</el-button>
         </template>
       </el-table-column>
@@ -148,38 +115,25 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改Lis检验信息对话框 -->
+    <!-- 添加或修改患者费用账单对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="消费事项" prop="name">
-          <el-input v-model="form.name" placeholder="请输入消费事项" />
+        <el-form-item label="门诊卡id" prop="outpatientid">
+          <el-input v-model="form.outpatientid" placeholder="请输入门诊卡id" />
         </el-form-item>
-        <el-form-item label="患者编号" prop="personid">
-          <el-input v-model="form.personid" placeholder="请输入患者编号" />
+        <el-form-item label="金额" prop="money">
+          <el-input v-model="form.money" placeholder="请输入金额" />
         </el-form-item>
-        <el-form-item label="医生编号" prop="doctorid">
-          <el-input v-model="form.doctorid" placeholder="请输入医生编号" />
-        </el-form-item>
-        <el-form-item label="生成日期" prop="createTime">
+
+        <el-form-item label="充值取现日期" prop="createtime">
           <el-date-picker clearable
-            v-model="form.createTime"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="请选择生成日期">
+                          v-model="form.createtime"
+                          type="date"
+                          value-format="yyyy-MM-dd"
+                          placeholder="请选择充值取现日期">
           </el-date-picker>
         </el-form-item>
-        <el-form-item label="状态">
-          <el-radio-group v-model="form.status">
-            <el-radio
-              v-for="dict in dict.type.t_medical_lis_info"
-              :key="dict.value"
-              :label="parseInt(dict.value)"
-            >{{dict.label}}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="门诊医生接诊记录编号" prop="receiverecordid">
-          <el-input v-model="form.receiverecordid" placeholder="请输入门诊医生接诊记录编号" />
-        </el-form-item>
+
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -190,11 +144,10 @@
 </template>
 
 <script>
-import { listInfo, getInfo, delInfo, addInfo, updateInfo } from "@/api/system/info1";
+import { listBill, getBill, delBill, addBill, updateBill } from "@/api/system/bill";
 
 export default {
-  name: "Info",
-  dicts: ['t_medical_lis_info'],
+  name: "Bill",
   data() {
     return {
       // 遮罩层
@@ -209,8 +162,8 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // Lis检验信息表格数据
-      infoList: [],
+      // 患者费用账单表格数据
+      billList: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -219,12 +172,9 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        name: null,
-        personid: null,
-        doctorid: null,
-        createTime: null,
-        status: null,
-        receiverecordid: null
+        outpatientid: null,
+        money: null,
+        createtime: null
       },
       // 表单参数
       form: {},
@@ -237,11 +187,11 @@ export default {
     this.getList();
   },
   methods: {
-    /** 查询Lis检验信息列表 */
+    /** 查询患者费用账单列表 */
     getList() {
       this.loading = true;
-      listInfo(this.queryParams).then(response => {
-        this.infoList = response.rows;
+      listBill(this.queryParams).then(response => {
+        this.billList = response.rows;
         this.total = response.total;
         this.loading = false;
       });
@@ -255,12 +205,9 @@ export default {
     reset() {
       this.form = {
         id: null,
-        name: null,
-        personid: null,
-        doctorid: null,
-        createTime: null,
-        status: 0,
-        receiverecordid: null
+        outpatientid: null,
+        money: null,
+        createtime: null
       };
       this.resetForm("form");
     },
@@ -284,16 +231,16 @@ export default {
     handleAdd() {
       this.reset();
       this.open = true;
-      this.title = "添加Lis检验信息";
+      this.title = "添加患者费用账单";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
       const id = row.id || this.ids
-      getInfo(id).then(response => {
+      getBill(id).then(response => {
         this.form = response.data;
         this.open = true;
-        this.title = "修改Lis检验信息";
+        this.title = "修改患者费用账单";
       });
     },
     /** 提交按钮 */
@@ -301,13 +248,13 @@ export default {
       this.$refs["form"].validate(valid => {
         if (valid) {
           if (this.form.id != null) {
-            updateInfo(this.form).then(response => {
+            updateBill(this.form).then(response => {
               this.$modal.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
-            addInfo(this.form).then(response => {
+            addBill(this.form).then(response => {
               this.$modal.msgSuccess("新增成功");
               this.open = false;
               this.getList();
@@ -319,8 +266,8 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
-      this.$modal.confirm('是否确认删除Lis检验信息编号为"' + ids + '"的数据项？').then(function() {
-        return delInfo(ids);
+      this.$modal.confirm('是否确认删除患者费用账单编号为"' + ids + '"的数据项？').then(function() {
+        return delBill(ids);
       }).then(() => {
         this.getList();
         this.$modal.msgSuccess("删除成功");
@@ -328,9 +275,9 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      this.download('system/info1/export', {
+      this.download('system/bill/export', {
         ...this.queryParams
-      }, `info_${new Date().getTime()}.xlsx`)
+      }, `bill_${new Date().getTime()}.xlsx`)
     }
   }
 };

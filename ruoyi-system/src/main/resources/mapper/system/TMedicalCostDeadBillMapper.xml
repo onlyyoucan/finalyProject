@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TMedicalCostDeadBillMapper">
+
+    <resultMap type="TMedicalCostDeadBill" id="TMedicalCostDeadBillResult">
+        <result property="id"    column="id"    />
+        <result property="realnoney"    column="realNoney"    />
+        <result property="accountmoney"    column="accountMoney"    />
+        <result property="username"    column="userName"    />
+        <result property="createtime"    column="createTime"    />
+    </resultMap>
+
+    <sql id="selectTMedicalCostDeadBillVo">
+        select id, realNoney, accountMoney, userName, createTime from t_medical_cost_dead_bill
+    </sql>
+
+    <select id="selectTMedicalCostDeadBillList" parameterType="TMedicalCostDeadBill" resultMap="TMedicalCostDeadBillResult">
+        <include refid="selectTMedicalCostDeadBillVo"/>
+        <where>
+            <if test="realnoney != null "> and realNoney = #{realnoney}</if>
+            <if test="accountmoney != null "> and accountMoney = #{accountmoney}</if>
+            <if test="username != null  and username != ''"> and userName like concat('%', #{username}, '%')</if>
+            <if test="createtime != null "> and createTime = #{createtime}</if>
+        </where>
+    </select>
+
+    <select id="selectTMedicalCostDeadBillById" parameterType="String" resultMap="TMedicalCostDeadBillResult">
+        <include refid="selectTMedicalCostDeadBillVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertTMedicalCostDeadBill" parameterType="TMedicalCostDeadBill">
+        insert into t_medical_cost_dead_bill
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="realnoney != null">realNoney,</if>
+            <if test="accountmoney != null">accountMoney,</if>
+            <if test="username != null">userName,</if>
+            <if test="createtime != null">createTime,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="realnoney != null">#{realnoney},</if>
+            <if test="accountmoney != null">#{accountmoney},</if>
+            <if test="username != null">#{username},</if>
+            <if test="createtime != null">#{createtime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateTMedicalCostDeadBill" parameterType="TMedicalCostDeadBill">
+        update t_medical_cost_dead_bill
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="realnoney != null">realNoney = #{realnoney},</if>
+            <if test="accountmoney != null">accountMoney = #{accountmoney},</if>
+            <if test="username != null">userName = #{username},</if>
+            <if test="createtime != null">createTime = #{createtime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteTMedicalCostDeadBillById" parameterType="String">
+        delete from t_medical_cost_dead_bill where id = #{id}
+    </delete>
+
+    <delete id="deleteTMedicalCostDeadBillByIds" parameterType="String">
+        delete from t_medical_cost_dead_bill where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

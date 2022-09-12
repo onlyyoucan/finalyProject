@@ -1,52 +1,18 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="消费事项" prop="name">
+      <el-form-item label="床位名称" prop="name">
         <el-input
           v-model="queryParams.name"
-          placeholder="请输入消费事项"
+          placeholder="请输入床位名称"
           clearable
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="患者编号" prop="personid">
+      <el-form-item label="病房编号" prop="sickroomid">
         <el-input
-          v-model="queryParams.personid"
-          placeholder="请输入患者编号"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="医生编号" prop="doctorid">
-        <el-input
-          v-model="queryParams.doctorid"
-          placeholder="请输入医生编号"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="生成时间" prop="createTime">
-        <el-date-picker clearable
-                        v-model="queryParams.createTime"
-                        type="date"
-                        value-format="yyyy-MM-dd"
-                        placeholder="请选择生成时间">
-        </el-date-picker>
-      </el-form-item>
-      <el-form-item label="状态" prop="status">
-        <el-select v-model="queryParams.status" placeholder="请选择状态" clearable>
-          <el-option
-            v-for="dict in dict.type.t_medical_lis_info"
-            :key="dict.value"
-            :label="dict.label"
-            :value="dict.value"
-          />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="门诊医生接诊记录编号" prop="receiverecordid">
-        <el-input
-          v-model="queryParams.receiverecordid"
-          placeholder="请输入门诊医生接诊记录编号"
+          v-model="queryParams.sickroomid"
+          placeholder="请输入病房编号"
           clearable
           @keyup.enter.native="handleQuery"
         />
@@ -65,7 +31,7 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
-          v-hasPermi="['system:info1:add']"
+          v-hasPermi="['system:bed:add']"
         >新增</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -76,7 +42,7 @@
           size="mini"
           :disabled="single"
           @click="handleUpdate"
-          v-hasPermi="['system:info1:edit']"
+          v-hasPermi="['system:bed:edit']"
         >修改</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -87,7 +53,7 @@
           size="mini"
           :disabled="multiple"
           @click="handleDelete"
-          v-hasPermi="['system:info1:remove']"
+          v-hasPermi="['system:bed:remove']"
         >删除</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -97,29 +63,18 @@
           icon="el-icon-download"
           size="mini"
           @click="handleExport"
-          v-hasPermi="['system:info1:export']"
+          v-hasPermi="['system:bed:export']"
         >导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="infoList" @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :data="bedList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="编号" align="center" prop="id" />
-      <el-table-column label="消费事项" align="center" prop="name" />
-      <el-table-column label="患者编号" align="center" prop="personid" />
-      <el-table-column label="医生编号" align="center" prop="doctorid" />
-      <el-table-column label="生成时间" align="center" prop="createTime" width="180">
-        <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="状态" align="center" prop="status">
-        <template slot-scope="scope">
-          <dict-tag :options="dict.type.t_medical_lis_info" :value="scope.row.status"/>
-        </template>
-      </el-table-column>
-      <el-table-column label="门诊医生接诊记录编号" align="center" prop="receiverecordid" />
+      <el-table-column label="床位名称" align="center" prop="name" />
+      <el-table-column label="病房编号" align="center" prop="sickroomid" />
+      <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -127,19 +82,19 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
-            v-hasPermi="['system:info1:edit']"
+            v-hasPermi="['system:bed:edit']"
           >修改</el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
-            v-hasPermi="['system:info1:remove']"
+            v-hasPermi="['system:bed:remove']"
           >删除</el-button>
         </template>
       </el-table-column>
     </el-table>
-
+    
     <pagination
       v-show="total>0"
       :total="total"
@@ -148,37 +103,17 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改Lis检验信息对话框 -->
+    <!-- 添加或修改床位记录对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="消费事项" prop="name">
-          <el-input v-model="form.name" placeholder="请输入消费事项" />
+        <el-form-item label="床位名称" prop="name">
+          <el-input v-model="form.name" placeholder="请输入床位名称" />
         </el-form-item>
-        <el-form-item label="患者编号" prop="personid">
-          <el-input v-model="form.personid" placeholder="请输入患者编号" />
+        <el-form-item label="病房编号" prop="sickroomid">
+          <el-input v-model="form.sickroomid" placeholder="请输入病房编号" />
         </el-form-item>
-        <el-form-item label="医生编号" prop="doctorid">
-          <el-input v-model="form.doctorid" placeholder="请输入医生编号" />
-        </el-form-item>
-        <el-form-item label="生成日期" prop="createTime">
-          <el-date-picker clearable
-            v-model="form.createTime"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="请选择生成日期">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="状态">
-          <el-radio-group v-model="form.status">
-            <el-radio
-              v-for="dict in dict.type.t_medical_lis_info"
-              :key="dict.value"
-              :label="parseInt(dict.value)"
-            >{{dict.label}}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="门诊医生接诊记录编号" prop="receiverecordid">
-          <el-input v-model="form.receiverecordid" placeholder="请输入门诊医生接诊记录编号" />
+        <el-form-item label="备注" prop="remark">
+          <el-input v-model="form.remark" placeholder="请输入备注" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -190,11 +125,10 @@
 </template>
 
 <script>
-import { listInfo, getInfo, delInfo, addInfo, updateInfo } from "@/api/system/info1";
+import { listBed, getBed, delBed, addBed, updateBed } from "@/api/system/bed";
 
 export default {
-  name: "Info",
-  dicts: ['t_medical_lis_info'],
+  name: "Bed",
   data() {
     return {
       // 遮罩层
@@ -209,8 +143,8 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // Lis检验信息表格数据
-      infoList: [],
+      // 床位记录表格数据
+      bedList: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -220,11 +154,7 @@ export default {
         pageNum: 1,
         pageSize: 10,
         name: null,
-        personid: null,
-        doctorid: null,
-        createTime: null,
-        status: null,
-        receiverecordid: null
+        sickroomid: null,
       },
       // 表单参数
       form: {},
@@ -237,11 +167,11 @@ export default {
     this.getList();
   },
   methods: {
-    /** 查询Lis检验信息列表 */
+    /** 查询床位记录列表 */
     getList() {
       this.loading = true;
-      listInfo(this.queryParams).then(response => {
-        this.infoList = response.rows;
+      listBed(this.queryParams).then(response => {
+        this.bedList = response.rows;
         this.total = response.total;
         this.loading = false;
       });
@@ -256,11 +186,8 @@ export default {
       this.form = {
         id: null,
         name: null,
-        personid: null,
-        doctorid: null,
-        createTime: null,
-        status: 0,
-        receiverecordid: null
+        sickroomid: null,
+        remark: null
       };
       this.resetForm("form");
     },
@@ -284,16 +211,16 @@ export default {
     handleAdd() {
       this.reset();
       this.open = true;
-      this.title = "添加Lis检验信息";
+      this.title = "添加床位记录";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
       const id = row.id || this.ids
-      getInfo(id).then(response => {
+      getBed(id).then(response => {
         this.form = response.data;
         this.open = true;
-        this.title = "修改Lis检验信息";
+        this.title = "修改床位记录";
       });
     },
     /** 提交按钮 */
@@ -301,13 +228,13 @@ export default {
       this.$refs["form"].validate(valid => {
         if (valid) {
           if (this.form.id != null) {
-            updateInfo(this.form).then(response => {
+            updateBed(this.form).then(response => {
               this.$modal.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
-            addInfo(this.form).then(response => {
+            addBed(this.form).then(response => {
               this.$modal.msgSuccess("新增成功");
               this.open = false;
               this.getList();
@@ -319,8 +246,8 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
-      this.$modal.confirm('是否确认删除Lis检验信息编号为"' + ids + '"的数据项？').then(function() {
-        return delInfo(ids);
+      this.$modal.confirm('是否确认删除床位记录编号为"' + ids + '"的数据项？').then(function() {
+        return delBed(ids);
       }).then(() => {
         this.getList();
         this.$modal.msgSuccess("删除成功");
@@ -328,9 +255,9 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      this.download('system/info1/export', {
+      this.download('system/bed/export', {
         ...this.queryParams
-      }, `info_${new Date().getTime()}.xlsx`)
+      }, `bed_${new Date().getTime()}.xlsx`)
     }
   }
 };
